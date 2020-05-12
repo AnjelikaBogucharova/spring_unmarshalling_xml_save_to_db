@@ -2,7 +2,6 @@ package com.anjelikabog.spring_unmarshalling_xml_save_to_db
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import marshalling_xml.Persons
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.integration.dsl.MessageChannels
@@ -12,7 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.messaging.MessageHeaders
 import org.springframework.messaging.support.ErrorMessage
 import java.io.File
-import javax.sql.DataSource
+import java.sql.Date
 
 @Configuration
 class ChanelConfiguration {
@@ -26,21 +25,13 @@ class ChanelConfiguration {
 @Configuration
 class FileConfiguration(
         private val channels: ChanelConfiguration,
-        private val xmlMapper: XmlMapper
+        private val xmlMapper: XmlMapper,
+        var jdbcTemplate: JdbcTemplate
 ) {
     private val input = File("src/main/resources/input")
     private val errors = File("src/main/resources/errors")
     private val archive = File("src/main/resources/archive")
-    @Autowired
-    private var dataSource: DataSource? = null
 
-    @Autowired
-    private var jdbcTemplate: JdbcTemplate? = null
-
-    fun setDataSource(dataSource: DataSource?) {
-        this.dataSource = dataSource
-        jdbcTemplate = JdbcTemplate(dataSource!!)
-    }
 
     @Bean
     fun filesFlow() = integrationFlow(
@@ -58,6 +49,28 @@ class FileConfiguration(
         handle { file: File, _: MessageHeaders ->
             val person = xmlMapper.readValue(file, Persons::class.java)
 
+
+            for (per in person.person!!) {
+                jdbcTemplate.update(
+                        "insert into persons(fullname, birthday) values (?,?)", per.name, per.birthday
+                );
+                for (hobbs in per.hobbies.hobby!!) {
+                    insertHobby.setInt(1, hob.getComplexity())
+                    insertHobby.setString(2, hob.getHobbyName())
+                    insertHobby.executeUpdate()
+                    rsPer = insertPersons.getGeneratedKeys()
+                    rsHob = insertHobby.getGeneratedKeys()
+                    if (rsPer.next()) {
+                        insertHobbies.setInt(1, rsPer.getInt(1))
+                    }
+                    if (rsHob.next()) {
+                        insertHobbies.setInt(2, rsHob.getInt(1))
+                    }
+                    insertHobbies.executeUpdate()
+
+                }
+            }
+            //listOf(person).forEach()
             val insertPersons = "insert into persons(fullname, birthday) values (?,?)"
             val insertHobby = "insert into hobby(complexity, hobby_name) values (?,?)"
             val insertHobbies = "insert into hobbies values (?,?)"
