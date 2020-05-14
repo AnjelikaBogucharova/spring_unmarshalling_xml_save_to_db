@@ -8,10 +8,14 @@ import org.springframework.integration.dsl.MessageChannels
 import org.springframework.integration.dsl.integrationFlow
 import org.springframework.integration.file.dsl.Files
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.support.GeneratedKeyHolder
 import org.springframework.messaging.MessageHeaders
 import org.springframework.messaging.support.ErrorMessage
 import java.io.File
 import java.sql.Date
+import java.sql.ResultSet
+import java.sql.Statement
+
 
 @Configuration
 class ChanelConfiguration {
@@ -48,34 +52,42 @@ class FileConfiguration(
 
         handle { file: File, _: MessageHeaders ->
             val person = xmlMapper.readValue(file, Persons::class.java)
-
+            var rsPer: ResultSet? = null
+            var rsHob: ResultSet
+            val keyHolderHobby = GeneratedKeyHolder()
+            val keyHolderPerson = GeneratedKeyHolder()
 
             for (per in person.person!!) {
-                jdbcTemplate.update(
-                        "insert into persons(fullname, birthday) values (?,?)", per.name, per.birthday
-                );
-                for (hobbs in per.hobbies.hobby!!) {
-                    insertHobby.setInt(1, hob.getComplexity())
-                    insertHobby.setString(2, hob.getHobbyName())
-                    insertHobby.executeUpdate()
-                    rsPer = insertPersons.getGeneratedKeys()
-                    rsHob = insertHobby.getGeneratedKeys()
-                    if (rsPer.next()) {
-                        insertHobbies.setInt(1, rsPer.getInt(1))
+
+                var insertPersons = jdbcTemplate.update ({ connection ->
+                    val ps = connection.prepareStatement("insert into persons(fullname, birthday) values (?,?)",
+                            Statement.RETURN_GENERATED_KEYS)
+                    ps.setString(1, per.name)
+                    ps.setDate(2, per.birthday?.time?.let { Date(it) })
+                    ps
+                }, keyHolderPerson)
+
+                for (hobbs in per.hobbies?.hobby!!) {
+
+                    var insertHobby = jdbcTemplate.update ({ connection ->
+                        val ps = connection.prepareStatement("insert into hobby(complexity,hobby_name) values (?,?)",
+                                Statement.RETURN_GENERATED_KEYS)
+                        ps.setInt(1, hobbs.complexity as Int)
+                        ps.setString(2, hobbs.hobby_name)
+                        ps
+                    }, keyHolderHobby)
+
+
+                    var insertHobbies = jdbcTemplate.update { connection ->
+                        val ps = connection.prepareStatement("insert into hobbies values (?,?)")
+                        ps.setLong(1, keyHolderPerson.keys?.get("id") as Long)
+                        ps.setLong(2, keyHolderHobby.keys?.get("id") as Long)
+                        ps
                     }
-                    if (rsHob.next()) {
-                        insertHobbies.setInt(2, rsHob.getInt(1))
-                    }
-                    insertHobbies.executeUpdate()
 
                 }
             }
-            //listOf(person).forEach()
-            val insertPersons = "insert into persons(fullname, birthday) values (?,?)"
-            val insertHobby = "insert into hobby(complexity, hobby_name) values (?,?)"
-            val insertHobbies = "insert into hobbies values (?,?)"
 
-            println(person)
             file
         }
         channel("xml")

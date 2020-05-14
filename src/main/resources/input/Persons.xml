@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Persons>
+    <Person>
+        <name>Ivanov Viacheslav Igorevich</name>
+        <birthday>1994-09-09</birthday>
+        <hobbies>
+            <hobby>
+                <complexity>10</complexity>
+                <hobby_name>Bycicle</hobby_name>
+            </hobby>
+        </hobbies>
+    </Person>
+    <Person>
+        <name>Fdafds Afcbfh Hhfgndfg</name>
+        <birthday>1984-11-11</birthday>
+        <hobbies>
+            <hobby>
+                <complexity>20</complexity>
+                <hobby_name>Monocicle</hobby_name>
+            </hobby>
+            <hobby>
+                <complexity>100</complexity>
+                <hobby_name>Fourcicle</hobby_name>
+            </hobby>
+        </hobbies>
+    </Person>
+    <Person>
+        <name>Kkpobmhtg Bklbjierg Okjdvopv</name>
+        <birthday>1974-12-12</birthday>
+        <hobbies>
+            <hobby>
+                <complexity>30</complexity>
+                <hobby_name>Tricicle</hobby_name>
+            </hobby>
+        </hobbies>
+    </Person>
+</Persons>

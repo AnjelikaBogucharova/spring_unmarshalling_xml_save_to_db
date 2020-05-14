@@ -23,7 +23,7 @@ Persons: $person
 
 data class Person(
         var name: String? = null,
-        @field: JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Moscow")
+        //@field: JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Europe/Moscow")
         var birthday: Date? = null,
         var hobbies: Hobbies? = null
 )
@@ -49,7 +49,7 @@ $hobby
 }
 
 data class Hobby(
-        var complexity: String? = null,
+        var complexity: Int? = null,
         var hobby_name: String? = null
 ) {
     override fun toString()="""
