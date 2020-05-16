@@ -1,7 +1,7 @@
 package com.anjelikabog.spring_unmarshalling_xml_save_to_db
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import marshalling_xml.Persons
+import com.anjelikabog.spring_unmarshalling_xml_save_to_db.xml.Persons
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.integration.dsl.MessageChannels

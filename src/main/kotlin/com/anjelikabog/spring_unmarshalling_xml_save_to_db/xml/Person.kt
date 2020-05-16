@@ -1,10 +1,7 @@
-package marshalling_xml
+package com.anjelikabog.spring_unmarshalling_xml_save_to_db.xml
 
-import com.fasterxml.jackson.annotation.JacksonAnnotation
-import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.dataformat.xml.annotation.*
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.*
 
 @JacksonXmlRootElement(localName = "Persons")
